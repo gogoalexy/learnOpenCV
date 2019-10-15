@@ -1,7 +1,7 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
-import FPS
+from timer import FPS
 import argparse
 import cv2
 
@@ -14,7 +14,7 @@ args = vars(ap.parse_args())
 
 print("[INFO] sampling frames from PiCam through pure OpenCV...")
 stream = cv2.VideoCapture(0)
-stream.set(cv2.CAP_PROP_FPS, 30)
+stream.set(cv2.CAP_PROP_FPS, 32)
 stream.set(cv2.CAP_PROP_FRAME_HEIGHT, frameHW[0])
 stream.set(cv2.CAP_PROP_FRAME_WIDTH, frameHW[1])
 time.sleep(2.0)
@@ -40,14 +40,14 @@ fps.reset()
 print("[INFO] sampling frames from PiCam through picamera module and OpenCV...")
 camera = PiCamera()
 camera.resolution = frameHW
-camera.framerate = 30
+camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=frameHW)
 stream = camera.capture_continuous(rawCapture, format="bgr", use_video_port=True)
 time.sleep(2.0)
 
 fps = FPS().start()
 while fps._numFrames < args["num_frames"]:
-	frame = f.array
+	frame = next(stream).array
 
 	if args["display"] > 0:
 		cv2.imshow("Frame", frame)

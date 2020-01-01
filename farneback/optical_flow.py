@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import scipy.ndimage
 
@@ -279,3 +280,17 @@ def flow_iterative(
     # TODO: return global displacement parameters and/or global displacement if mu != 0
 
     return d
+
+
+def motion2color(flow):
+    # Use Hue, Saturation, Value colour model
+    height = flow.shape[0]
+    width = flow.shape[1]
+    hsv = np.zeros([height, width, 3], dtype=np.uint8)
+    hsv[..., 1] = 255
+
+    mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+    hsv[..., 0] = ang * 180 / np.pi / 2
+    hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+    bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    return bgr
